@@ -9,11 +9,14 @@ TEXT_EXTENSIONS = {".txt", ".md", ".csv", ".json", ".log", ".py", ".java", ".c",
 def _extract_text_pdf(path: Path) -> str:
     try:
         from pypdf import PdfReader  # type: ignore
-    except Exception:
-        return ""
-    try:
+
         reader = PdfReader(str(path))
-        return "\n".join((page.extract_text() or "") for page in reader.pages).strip()
+        chunks: list[str] = []
+        for page in reader.pages:
+            page_text = page.extract_text() or ""
+            if page_text:
+                chunks.append(page_text)
+        return "\n".join(chunks).strip()
     except Exception:
         return ""
 
@@ -21,11 +24,10 @@ def _extract_text_pdf(path: Path) -> str:
 def _extract_text_docx(path: Path) -> str:
     try:
         import docx  # type: ignore
-    except Exception:
-        return ""
-    try:
+
         doc = docx.Document(str(path))
-        return "\n".join(p.text for p in doc.paragraphs if p.text).strip()
+        paragraphs = [p.text.strip() for p in doc.paragraphs if p.text and p.text.strip()]
+        return "\n".join(paragraphs).strip()
     except Exception:
         return ""
 

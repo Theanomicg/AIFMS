@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Local runtime outputs
+logs/
+models/
+organized_output/
+test_input/
+
+# Optional local data dumps
+*.joblib

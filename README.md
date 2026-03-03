@@ -68,11 +68,11 @@ python -m aifms.cli organize ^
 ## Notes
 
 - Runs fully offline.
-- Text extraction for `pdf` and `docx` is optional and depends on installed libraries.
+- Text extraction supports `pdf` and `docx` via `pypdf` and `python-docx`.
 - If extraction fails, the system falls back to filename-based classification.
 
-Optional extractor dependencies:
+Install/upgrade dependencies:
 
 ```bash
-pip install pypdf python-docx
+pip install -r requirements.txt
 ```
