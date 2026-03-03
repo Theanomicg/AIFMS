@@ -65,6 +65,20 @@ python -m aifms.cli organize ^
   --log-path logs/run_log.csv
 ```
 
+## Desktop UI
+
+Launch the desktop app:
+
+```bash
+python -m aifms.cli gui
+```
+
+UI tabs:
+
+- `Model`: Train and save model, or load existing model
+- `Organize`: Set input/output/log paths and run preview/direct organize
+- `Review`: Inspect predictions and override categories before applying
+
 ## Notes
 
 - Runs fully offline.

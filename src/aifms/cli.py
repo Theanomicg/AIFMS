@@ -1,36 +1,17 @@
 from __future__ import annotations
 
 import argparse
-import csv
 from pathlib import Path
 
 from .classifier import load_model, save_model, train_model
-from .nlp import process_text
 from .pipeline import run_organization_pipeline
-
-
-def _load_training_dataset(csv_path: Path) -> tuple[list[str], list[str]]:
-    texts: list[str] = []
-    labels: list[str] = []
-    with csv_path.open("r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        if "text" not in (reader.fieldnames or []) or "label" not in (reader.fieldnames or []):
-            raise ValueError("Dataset CSV must include 'text' and 'label' columns.")
-        for row in reader:
-            raw_text = (row.get("text") or "").strip()
-            label = (row.get("label") or "").strip()
-            if raw_text and label:
-                texts.append(process_text(raw_text))
-                labels.append(label)
-    if not texts:
-        raise ValueError("No valid rows found in dataset.")
-    return texts, labels
+from .training import load_training_dataset
 
 
 def cmd_train(args: argparse.Namespace) -> int:
     dataset = Path(args.dataset)
     model_out = Path(args.model_out)
-    texts, labels = _load_training_dataset(dataset)
+    texts, labels = load_training_dataset(dataset)
     bundle = train_model(texts, labels, min_confidence=args.min_confidence)
     save_model(bundle, model_out)
     print(f"Model trained and saved to: {model_out}")
@@ -57,6 +38,12 @@ def cmd_organize(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_gui(_: argparse.Namespace) -> int:
+    from .gui import main as gui_main
+
+    return int(gui_main())
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="AI-Based File Management System (AIFMS)")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -75,6 +62,9 @@ def build_parser() -> argparse.ArgumentParser:
     organize_parser.add_argument("--copy-only", action="store_true", help="Copy files instead of moving")
     organize_parser.add_argument("--no-recursive", action="store_true", help="Disable recursive scan")
     organize_parser.set_defaults(func=cmd_organize)
+
+    gui_parser = subparsers.add_parser("gui", help="Launch desktop GUI")
+    gui_parser.set_defaults(func=cmd_gui)
 
     return parser
 
